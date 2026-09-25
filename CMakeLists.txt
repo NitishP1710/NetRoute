@@ -26,8 +26,15 @@ else()
     target_compile_options(netroute_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-add_executable(netroute src/main.cpp)
+add_executable(netroute
+    src/main.cpp
+    src/http_server.cpp
+)
 target_link_libraries(netroute PRIVATE netroute_core)
+
+if (WIN32)
+    target_link_libraries(netroute PRIVATE ws2_32)
+endif()
 
 if (NETROUTE_BUILD_TESTS)
     include(FetchContent)
