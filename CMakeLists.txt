@@ -10,6 +10,7 @@ option(NETROUTE_BUILD_TESTS "Build tests" ON)
 add_library(netroute_core
     src/link.cpp
     src/network.cpp
+    src/router.cpp
     src/routing_engine.cpp
     src/routing_strategy.cpp
 )
