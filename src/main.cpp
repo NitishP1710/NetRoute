@@ -1,34 +1,14 @@
+#include "netroute/http_server.hpp"
 #include "netroute/network.hpp"
 #include "netroute/router.hpp"
 #include "netroute/routing_engine.hpp"
 
-#include <iomanip>
+#include <cstdlib>
 #include <iostream>
 
 using namespace netroute;
 
 namespace {
-
-void print_route(const Route& route) {
-    if (!route.reachable()) {
-        std::cout << "No route available.\n";
-        return;
-    }
-
-    for (std::size_t i = 0; i < route.routers.size(); ++i) {
-        if (i > 0) {
-            std::cout << " -> ";
-        }
-        std::cout << route.routers[i];
-    }
-
-    std::cout << "\n"
-              << "Cost: " << std::fixed << std::setprecision(2)
-              << route.total_cost << "\n"
-              << "Latency: " << route.total_latency_ms << " ms\n"
-              << "Min bandwidth: " << route.minimum_bandwidth_mbps << " Mbps\n"
-              << "Packet-loss sum: " << route.total_packet_loss_percent << "%\n";
-}
 
 Network build_demo_network() {
     Network network;
@@ -50,22 +30,24 @@ Network build_demo_network() {
 } // namespace
 
 int main() {
-    auto network = build_demo_network();
-    RoutingEngine engine;
+    try {
+        auto network = build_demo_network();
+        RoutingEngine engine;
 
-    std::cout << "=== NetRoute Demo ===\n\n";
-    std::cout << "Initial route R1 -> R4:\n";
-    print_route(engine.find_route(network, "R1", "R4"));
+        std::uint16_t port = 8080;
+        if (const char* value = std::getenv("NETROUTE_PORT")) {
+            const auto parsed = std::strtoul(value, nullptr, 10);
+            if (parsed > 0 && parsed <= 65535) {
+                port = static_cast<std::uint16_t>(parsed);
+            }
+        }
 
-    std::cout << "\nFailing link L24...\n";
-    network.fail_link("L24");
+        HttpServer server(network, engine, port);
+        server.run();
+    } catch (const std::exception& error) {
+        std::cerr << "NetRoute failed: " << error.what() << '\n';
+        return 1;
+    }
 
-    std::cout << "Recomputed route R1 -> R4:\n";
-    print_route(engine.find_route(network, "R1", "R4"));
-
-    std::cout << "\nRecovering link L24...\n";
-    network.recover_link("L24");
-
-    std::cout << "Recomputed route R1 -> R4:\n";
-    print_route(engine.find_route(network, "R1", "R4"));
+    return 0;
 }
