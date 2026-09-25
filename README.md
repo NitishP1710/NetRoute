@@ -4,17 +4,18 @@ A modern C++ network route planner and failure simulator with a small browser UI
 
 ## What it demonstrates
 
-- C++17 and object-oriented design
+- C++14 and object-oriented design
 - Graph data structures and adjacency lists
 - Dijkstra shortest-path routing
 - Strategy pattern for route-cost policies
 - Link failure/recovery and automatic rerouting
+- Live topology editing: add routers and links from the browser
+- Failure controls generated from the current topology, including newly added links
 - Route metrics: latency, bandwidth, packet loss and cost
 - Lightweight HTTP server written in C++
 - Browser UI connected to the C++ backend through REST-like HTTP endpoints
 - CMake build system
 - GoogleTest unit tests
-- GitHub Actions CI
 
 ## Architecture
 
@@ -74,17 +75,39 @@ GoogleTest is downloaded by CMake when tests are enabled.
 - Recover a link from the UI
 - Immediately recompute the route
 - See current topology/link state
+- Add a router by providing its ID and IP address
+- Add a link by providing its endpoints and latency, bandwidth and packet-loss metrics
+
+Topology changes are held in memory by the running C++ process. Restarting the
+program restores the demo topology from `src/main.cpp`.
 
 ## API
 
 ```
 GET  /api/state
 GET  /api/route?source=R1&destination=R4
+POST /api/routers
+POST /api/links
 POST /api/links/L24/fail
 POST /api/links/L24/recover
 ```
 
-The API operates on the same in-memory `Network` object used by the routing engine, so a link failure in the browser immediately changes the graph used by Dijkstra.
+`POST /api/routers` accepts URL-encoded fields:
+
+```text
+id=R5&ip=10.0.0.5
+```
+
+`POST /api/links` accepts URL-encoded fields:
+
+```text
+id=L45&source=R4&destination=R5&latency=12&bandwidth=700&packetLoss=0.2
+```
+
+The API operates on the same in-memory `Network` object used by the routing
+engine. Every state response enumerates the current routers and links, so a
+newly added link immediately appears in the failure list and is used by
+Dijkstra after it is failed or recovered.
 
 ## Example
 
@@ -94,13 +117,14 @@ Initial:
 R1 -> R2 -> R4
 ```
 
-Fail `L24` in the UI:
+Add router `R5` and link `L45` from `R4` to `R5`, then fail `L24` in the UI:
 
 ```
 R1 -> R3 -> R4
 ```
 
-Recover it and the original route becomes available again.
+Recover it and the original route becomes available again. The same controls
+work for `L45` or any other link added during the session.
 
 ## Project structure
 
@@ -127,8 +151,7 @@ NetRoute/
 │   ├── app.js
 │   ├── index.html
 │   └── style.css
-├── CMakeLists.txt
-└── .github/workflows/ci.yml
+└── CMakeLists.txt
 ```
 
 ## Why the UI is useful

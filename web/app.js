@@ -9,23 +9,37 @@ async function api(path, options = {}) {
 function populateRouters(routers) {
   for (const id of ["source", "destination"]) {
     const select = $(id);
-    select.innerHTML = routers.map(r => `<option value="${r.id}">${r.id}</option>`).join("");
+    select.innerHTML = routers
+      .map((r) => `<option value="${r.id}">${r.id}</option>`)
+      .join("");
   }
   if (routers.length > 1) $("destination").selectedIndex = 1;
+  for (const id of ["linkSource", "linkDestination"]) {
+    const select = $(id);
+    if (select) {
+      select.innerHTML = routers
+        .map((r) => `<option value="${r.id}">${r.id}</option>`)
+        .join("");
+    }
+  }
 }
 
 function renderTopology(state) {
-  $("topology").innerHTML = state.routers.map(r =>
-    `<div class="node"><strong>${r.id}</strong><span>${r.ip}</span></div>`
-  ).join("");
+  $("topology").innerHTML = state.routers
+    .map(
+      (r) =>
+        `<div class="node"><strong>${r.id}</strong><span>${r.ip}</span></div>`,
+    )
+    .join("");
 }
 
 function renderLinks(state) {
   $("linkCount").textContent = `${state.links.length} links`;
-  $("links").innerHTML = state.links.map(link => {
-    const action = link.active ? "fail" : "recover";
-    const label = link.active ? "Fail link" : "Recover";
-    return `
+  $("links").innerHTML = state.links
+    .map((link) => {
+      const action = link.active ? "fail" : "recover";
+      const label = link.active ? "Fail link" : "Recover";
+      return `
       <div class="link ${link.active ? "" : "failed"}">
         <div>
           <div class="link-name">${link.id}: ${link.source} ↔ ${link.destination}</div>
@@ -33,7 +47,8 @@ function renderLinks(state) {
         </div>
         <button onclick="changeLink('${link.id}', '${action}')">${label}</button>
       </div>`;
-  }).join("");
+    })
+    .join("");
 }
 
 async function loadState() {
@@ -46,11 +61,14 @@ async function loadState() {
 async function findRoute() {
   const source = $("source").value;
   const destination = $("destination").value;
-  const route = await api(`/api/route?source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}`);
+  const route = await api(
+    `/api/route?source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}`,
+  );
 
   if (!route.reachable) {
     $("routePath").textContent = "No route available";
-    for (const id of ["latency", "bandwidth", "cost", "packetLoss"]) $(id).textContent = "—";
+    for (const id of ["latency", "bandwidth", "cost", "packetLoss"])
+      $(id).textContent = "—";
     return;
   }
 
@@ -67,12 +85,37 @@ async function changeLink(id, action) {
   await findRoute();
 }
 
+async function submitForm(event, endpoint) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const message = $("editorMessage");
+  try {
+    await api(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(new FormData(form)),
+    });
+    form.reset();
+    await loadState();
+    await findRoute();
+    message.textContent = "Topology updated";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+}
+
 $("routeBtn").addEventListener("click", findRoute);
+$("routerForm").addEventListener("submit", (event) =>
+  submitForm(event, "/api/routers"),
+);
+$("linkForm").addEventListener("submit", (event) =>
+  submitForm(event, "/api/links"),
+);
 
 loadState()
   .then(findRoute)
-  .then(() => $("status").textContent = "C++ backend connected")
-  .catch(error => {
+  .then(() => ($("status").textContent = "C++ backend connected"))
+  .catch((error) => {
     $("status").textContent = "Backend error";
     console.error(error);
   });

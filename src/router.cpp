@@ -2,12 +2,15 @@
 
 #include <utility>
 
-namespace netroute {
+using namespace std;
 
-Router::Router(std::string id, std::string ip_address)
-    : id_(std::move(id)), ip_address_(std::move(ip_address)) {}
+namespace netroute
+{
 
-const std::string& Router::id() const noexcept { return id_; }
-const std::string& Router::ip_address() const noexcept { return ip_address_; }
+    Router::Router(std::string id, std::string ip_address)
+        : id_(std::move(id)), ip_address_(std::move(ip_address)) {}
+
+    const std::string &Router::id() const noexcept { return id_; }
+    const std::string &Router::ip_address() const noexcept { return ip_address_; }
 
 } // namespace netroute

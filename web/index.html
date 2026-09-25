@@ -58,6 +58,28 @@
       </div>
       <div id="topology" class="topology"></div>
     </section>
+
+    <section class="panel editor">
+      <div class="section-heading">
+        <h2>Modify topology</h2>
+        <span>Add routers and links to the current network</span>
+      </div>
+      <form id="routerForm" class="form-grid">
+        <input name="id" placeholder="Router ID (R5)" required>
+        <input name="ip" placeholder="IP address" required>
+        <button type="submit">Add router</button>
+      </form>
+      <form id="linkForm" class="form-grid link-form">
+        <input name="id" placeholder="Link ID (L45)" required>
+        <select id="linkSource" name="source" required></select>
+        <select id="linkDestination" name="destination" required></select>
+        <input name="latency" type="number" min="0" step="0.1" placeholder="Latency ms" required>
+        <input name="bandwidth" type="number" min="0.1" step="0.1" placeholder="Bandwidth Mbps" required>
+        <input name="packetLoss" type="number" min="0" max="100" step="0.1" placeholder="Packet loss %" required>
+        <button type="submit">Add link</button>
+      </form>
+      <p id="editorMessage" class="form-message"></p>
+    </section>
   </main>
   <script src="/app.js"></script>
 </body>

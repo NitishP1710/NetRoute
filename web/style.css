@@ -38,8 +38,13 @@ button:hover { background: #1d4ed8; }
 .node { padding: 12px 16px; border-radius: 12px; background: #101827; border: 1px solid #2d3c58; }
 .node strong { display: block; }
 .node span { color: #718198; font-size: 12px; }
+.editor { margin-top: 20px; }
+.form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.form-grid input, .form-grid select { width: 100%; padding: 11px 12px; border-radius: 9px; border: 1px solid #34435f; background: #0f172a; color: #e8edf5; }
+.link-form { grid-template-columns: repeat(3, 1fr); margin-top: 12px; }
+.form-message { min-height: 18px; color: #86efac; font-size: 13px; }
 @media (max-width: 760px) {
-  .controls, .grid { grid-template-columns: 1fr; }
+  .controls, .grid, .form-grid, .link-form { grid-template-columns: 1fr; }
   .arrow { display: none; }
   .metrics { grid-template-columns: 1fr 1fr; }
   header { flex-direction: column; }
