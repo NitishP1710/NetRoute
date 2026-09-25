@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetRoute</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div>
+        <p class="eyebrow">C++ NETWORK ROUTING ENGINE</p>
+        <h1>NetRoute</h1>
+        <p class="subtitle">Explore routes, simulate link failures, and watch the engine reroute traffic.</p>
+      </div>
+      <span id="status" class="status">Connecting…</span>
+    </header>
+
+    <section class="panel controls">
+      <div>
+        <label for="source">Source</label>
+        <select id="source"></select>
+      </div>
+      <div class="arrow">→</div>
+      <div>
+        <label for="destination">Destination</label>
+        <select id="destination"></select>
+      </div>
+      <button id="routeBtn">Find route</button>
+    </section>
+
+    <section class="grid">
+      <article class="panel result">
+        <h2>Optimal route</h2>
+        <div id="routePath" class="route-path">Choose two routers.</div>
+        <div class="metrics">
+          <div><span>Latency</span><strong id="latency">—</strong></div>
+          <div><span>Bandwidth</span><strong id="bandwidth">—</strong></div>
+          <div><span>Cost</span><strong id="cost">—</strong></div>
+          <div><span>Packet loss</span><strong id="packetLoss">—</strong></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="section-heading">
+          <h2>Network links</h2>
+          <span id="linkCount"></span>
+        </div>
+        <div id="links" class="links"></div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Topology</h2>
+        <span>Live state from C++</span>
+      </div>
+      <div id="topology" class="topology"></div>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>
