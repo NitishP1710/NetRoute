@@ -5,7 +5,6 @@
 #include <queue>
 #include <stdexcept>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace netroute {
 
@@ -79,7 +78,7 @@ Route RoutingEngine::find_route(const Network& network,
         }
     }
 
-    if (!previous.contains(destination)) {
+    if (previous.find(destination) == previous.end()) {
         return {};
     }
 
