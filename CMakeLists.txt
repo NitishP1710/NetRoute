@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(NETROUTE_BUILD_TESTS "Build tests" ON)
-
 add_library(netroute_core
     src/link.cpp
     src/network.cpp
@@ -34,32 +32,4 @@ target_link_libraries(netroute PRIVATE netroute_core)
 
 if (WIN32)
     target_link_libraries(netroute PRIVATE ws2_32)
-endif()
-
-if (NETROUTE_BUILD_TESTS)
-    include(FetchContent)
-
-    FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-
-    enable_testing()
-
-    add_executable(netroute_tests
-        tests/routing_engine_tests.cpp
-    )
-
-    target_link_libraries(netroute_tests
-        PRIVATE
-            netroute_core
-            GTest::gtest_main
-    )
-
-    include(GoogleTest)
-    gtest_discover_tests(netroute_tests)
 endif()

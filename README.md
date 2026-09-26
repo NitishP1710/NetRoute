@@ -15,7 +15,6 @@ A modern C++ network route planner and failure simulator with a small browser UI
 - Lightweight HTTP server written in C++
 - Browser UI connected to the C++ backend through REST-like HTTP endpoints
 - CMake build system
-- GoogleTest unit tests
 
 ## Architecture
 
@@ -57,14 +56,6 @@ You can change the port:
 ```bash
 NETROUTE_PORT=9090 ./build/netroute
 ```
-
-### Tests
-
-```bash
-ctest --test-dir build --output-on-failure
-```
-
-GoogleTest is downloaded by CMake when tests are enabled.
 
 ## UI capabilities
 
